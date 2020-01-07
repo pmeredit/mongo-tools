@@ -1,6 +1,6 @@
 #!/bin/bash
-set -o errexit
 tags=""
+
 if [ ! -z "$1" ]
   then
   	tags="$@"
@@ -15,11 +15,12 @@ set_goenv || exit
 
 BINARY_EXT=""
 UNAME_S=$(PATH="/usr/bin:/bin" uname -s)
-    case ${UNAME_S} in
-        CYGWIN*)
-            BINARY_EXT=".exe"
+
+case ${UNAME_S} in
+   CYGWIN*)
+        BINARY_EXT=".exe"
         ;;
-    esac
+esac
 
 # remove stale packages
 rm -rf vendor/pkg

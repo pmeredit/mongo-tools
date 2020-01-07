@@ -1,6 +1,6 @@
 #!/bin/bash
 # Copyright (c) 2018-Present MongoDB Inc.
-# This file should be sourced by all scripts in mongodb-odbc-driver/bin
+# This file should be sourced by all scripts in bin
 
 # we start by sourcing platforms.sh. this will set environment variables that
 # differ depending on which platform we are building on
@@ -18,13 +18,13 @@ fi
 PROJECT_ROOT="$SCRIPT_DIR/../.."
 
 basename=${0##*/}
-ARTIFACTS_DIR="$PROJECT_ROOT/mongodb-odbc-driver/artifacts"
-BUILD_DIR="$PROJECT_ROOT/mongodb-odbc-driver/build"
-BUILD_SRC_DIR="$PROJECT_ROOT/mongodb-odbc-driver/src"
-DMG_BUILD_DIR="$PROJECT_ROOT/mongodb-odbc-driver/dmg-build"
+ARTIFACTS_DIR="$PROJECT_ROOT/bin"
+BUILD_DIR="$PROJECT_ROOT/build"
+BUILD_SRC_DIR="$PROJECT_ROOT/src"
+DMG_BUILD_DIR="$PROJECT_ROOT/dmg-build"
 LOG_FILE="$ARTIFACTS_DIR/log/${basename%.sh}.log"
-MDBODBC_VER="$(cat "$SCRIPT_DIR"/VERSION.txt)"
-MSI_BUILD_DIR="$PROJECT_ROOT/mongodb-odbc-driver/msi-build"
+MDBTOOLS_VER="$(cat "$SCRIPT_DIR"/VERSION.txt)"
+MSI_BUILD_DIR="$PROJECT_ROOT/installer/msi-build"
 PROJECT_DIR="$(dirname "$(dirname $SCRIPT_DIR)")"
 
 # if on cygwin, convert paths as needed
@@ -41,25 +41,23 @@ echo "done setting up repo for testing"
 
 CMAKE_MODULE_PATH="$BUILD_SRC_DIR/cmake"
 DRIVERS_DIR="$ARTIFACTS_DIR/drivers"
-IODBC_VERSION=iODBC-3.52.12
-IODBC_BUILD_DIR="$BUILD_DIR"/"$IODBC_VERSION"/mac
-IODBCTEST_PATH="$IODBC_BUILD_DIR"/iODBCtest/build/Deployment
-IODBCTESTW_PATH="$IODBC_BUILD_DIR"/iODBCtestw/build/Deployment
+ITOOLS_VERSION=iTOOLS-3.52.12
+ITOOLS_BUILD_DIR="$BUILD_DIR"/"$ITOOLS_VERSION"/mac
+ITOOLSTEST_PATH="$ITOOLS_BUILD_DIR"/iTOOLStest/build/Deployment
+ITOOLSTESTW_PATH="$ITOOLS_BUILD_DIR"/iTOOLStestw/build/Deployment
 MONGODB_DIR="$ARTIFACTS_DIR/mongodb"
-MYSQL_PROJECT_DIR="$PROJECT_ROOT/mongodb-odbc-driver/libmongosql"
+MYSQL_PROJECT_DIR="$PROJECT_ROOT/libmongosql"
 MYSQL_SCRIPT_DIR="$MYSQL_PROJECT_DIR/bld/bin"
 MYSQL_DIR="$MYSQL_PROJECT_DIR/bld/artifacts/mysql-home"
 MONGOSQL_AUTH_PROJECT_DIR="$MYSQL_PROJECT_DIR/bld/mongosql-auth-c"
 PKG_DIR="$ARTIFACTS_DIR/pkg"
 SQLPROXY_DIR="$ARTIFACTS_DIR/mongosqld"
 
-PATH="$PATH:$DEVENV_PATH:$CMAKE_PATH:$WIX_PATH:$IODBCTEST_PATH:$IODBCTESTW_PATH"
+PATH="$PATH:$DEVENV_PATH:$CMAKE_PATH:$WIX_PATH:$ITOOLSTEST_PATH:$ITOOLSTESTW_PATH"
 
 # export any environment variables that will be needed by subprocesses
 export CMAKE_MODULE_PATH
-export IODBC_VERSION
-export IODBC_BUILD_DIR
-export MDBODBC_VER
+export MDBTOOLS_VER
 export MYSQL_DIR
 
 # Each script should run with errexit set and should start in the project root.

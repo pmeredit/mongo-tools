@@ -9,7 +9,7 @@
       exit 0
   fi
 
-  PREFIX=mongodb-tools-"$MDBTools_VER"-win-x86-64
+  PREFIX=mongodb-tools-"$MDBTOOLS_VER"-win-x86-64
 
   # clear MSI_BUILD_DIR
   rm -rf "$MSI_BUILD_DIR"
@@ -36,7 +36,7 @@
           -ExecutionPolicy ByPass \
           -File ./build-msi.ps1 \
           -Arch "$arch" \
-          -VersionLabel "$MDBTools_VER"
+          -VersionLabel "$MDBTOOLS_VER"
 
   # clear PKG_DIR
   rm -rf "$PKG_DIR"
