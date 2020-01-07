@@ -22,7 +22,7 @@ $objDIr = ".\objs\"
 $WixPath = "C:\wixtools\bin\"
 $wixUiExt = "$WixPath\WixUIExtension.dll"
 
-if (-not ($VersionLabel -match "(\d\.\d).*")) {
+if (-not ($VersionLabel -match "(\d\d?\d?\.\d\d?\d?).*")) {
     throw "invalid version specified: $VersionLabel"
 }
 $version = $matches[1]
@@ -31,7 +31,7 @@ $version = $matches[1]
 # rev the minor version (1.0 -> 1.1). That way, we
 # will allow multiple minor versions to be installed
 # side-by-side.
-if ([double]$version -gt 1.2) {
+if ([double]$version -gt 10.0) {
     throw "You must change the upgrade code for a minor revision.
 Once that is done, change the version number above to
 account for the next revision that will require being
