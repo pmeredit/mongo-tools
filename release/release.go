@@ -116,8 +116,7 @@ func buildLinuxPackages() {
 	} else if platform.IsDeb(platformName) {
 		buildDeb()
 	} else {
-		check(fmt.Errorf("linux platform type is neither deb nor rpm based"),
-			"linux platform type is neither deb nor rpm based: " + platformName)
+		log.Fatalf("linux platform type is neither deb nor rpm based: " + platformName)
 	}
 }
 
@@ -224,7 +223,7 @@ func buildDeb() {
 			src := filepath.Join(binariesPath, binName)
 			dst := filepath.Join(binDir, binName)
 			logCopy(src, dst)
-			os.Link(src, dst)
+			check(os.Link(src, dst), "link file")
 			md5sums[dst] = computeMD5(src)
 			md5sumsOrder = append(md5sumsOrder, dst)
 		}
@@ -233,7 +232,7 @@ func buildDeb() {
 			src := filepath.Join("..", file)
 			dst := filepath.Join(docDir, file)
 			logCopy(src, dst)
-			os.Link(src, dst)
+			check(os.Link(src, dst), "link file")
 			md5sums[dst] = computeMD5(src)
 			md5sumsOrder = append(md5sumsOrder, dst)
 		}
@@ -253,7 +252,8 @@ func buildDeb() {
 		p, err := platform.Get()
 		check(err, "get platform")
 		content = strings.Replace(content, "@ARCHITECTURE@", platform.DebianArch(p.Arch), 1)
-		f.WriteString(content)
+		_, err = f.WriteString(content)
+		check(err, "write content to control file")
 	}
 	createControlFile()
 
@@ -267,7 +267,7 @@ func buildDeb() {
 		for _, path := range md5sumsOrder {
 			md5sum, ok := md5sums[path]
 			if !ok {
-				check(fmt.Errorf("could not find md5sum, this is a code mistake"), "find md5sum")
+				log.Fatalf("could not find md5sum for " + path)
 			}
 			_, err = f.WriteString(md5sum + " ")
 			check(err, "write md5sum to md5sums")
@@ -290,12 +290,12 @@ func buildDeb() {
 		// add the control file.
 		dst := filepath.Join(controlDir, controlFile)
 		logCopy(controlFile, dst)
-		os.Link(controlFile, dst)
+		check(os.Link(controlFile, dst), "link file")
 
 		// add the md5sumsFile.
 		dst = filepath.Join(controlDir, md5sumsFile)
 		logCopy(md5sumsFile, dst)
-		os.Link(md5sumsFile, dst)
+		check(os.Link(md5sumsFile, dst), "link file")
 
 
 		// add the static control files.
@@ -304,7 +304,7 @@ func buildDeb() {
 			src := filepath.Join("..", "installer", "deb", file)
 			dst = filepath.Join(controlDir, file)
 			logCopy(src, dst)
-			os.Link(src, dst)
+			check(os.Link(src, dst), "link file")
 		}
 	}
 
