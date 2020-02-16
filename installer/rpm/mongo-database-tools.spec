@@ -52,9 +52,9 @@ rm -rf $RPM_BUILD_ROOT
 %attr(0755,mongod,mongod) /usr/bin/mongorestore
 %attr(0755,mongod,mongod) /usr/bin/mongostat
 %attr(0755,mongod,mongod) /usr/bin/mongotop
-%attr(0755,mongod,mongod) /usr/share/doc/mongo-database-tools/LICENSE.md
-%attr(0755,mongod,mongod) /usr/share/doc/mongo-database-tools/README.md
-%attr(0755,mongod,mongod) /usr/share/doc/mongo-database-tools/THIRD-PARTY-NOTICES
+%attr(0644,mongod,mongod) /usr/share/doc/mongo-database-tools/LICENSE.md
+%attr(0644,mongod,mongod) /usr/share/doc/mongo-database-tools/README.md
+%attr(0644,mongod,mongod) /usr/share/doc/mongo-database-tools/THIRD-PARTY-NOTICES
 %doc licenses
 
 %pre
@@ -71,26 +71,6 @@ fi
 exit 0
 
 %post
-ln -sf ../versions/mongodb-mms-automation-agent-@AGENT_VERSION@ /opt/mongodb-mms-automation/bin/mongodb-mms-automation-agent
-chown -h mongod:mongod /opt/mongodb-mms-automation/bin/mongodb-mms-automation-agent
-
-# On install
-if test $1 = 1; then
-    /sbin/chkconfig --add mongodb-mms-automation-agent
-
-    # Create empty properties file to support server pool functionality
-    if [ "@AGENT_ENV@" = 'hosted' ]; then
-        touch /etc/mongodb-mms/server-pool.properties
-        chmod 644 /etc/mongodb-mms/server-pool.properties
-        chown mongod:mongod /etc/mongodb-mms/server-pool.properties
-    fi
-fi
-
-# On upgrade, `pre` stopped the service, so start it up again
-if test $1 = 2; then
-    /etc/init.d/mongodb-mms-automation-agent start
-fi
-
 exit 0
 
 %postun
@@ -105,6 +85,8 @@ if test $1 = 0; then
    rm -f /usr/bin/mongostat
    rm -f /usr/bin/mongotop
    rm -f /usr/share/doc/mongo-database-tools/*
+   # remove the symlink too.
+   rm /usr/doc/mongo-database-tools
 fi
 
 exit 0
