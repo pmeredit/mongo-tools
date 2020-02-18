@@ -8,6 +8,7 @@ URL:        http://mms.mongodb.com
 Vendor:     MongoDB
 BuildArchitectures: @ARCHITECTURE@
 Obsoletes:  mongodb-database-tools
+BuildRoot: %{_topdir}/BUILD/%{name}-%{version}-%{release}
 
 %description
 mongodb-database-tools package provides tools for working with the MongoDB server:
@@ -32,9 +33,14 @@ echo %{version}
 echo ${_sourcedir}
 
 %install
-rm -rf $RPM_BUILD_ROOT
-mkdir -p $RPM_BUILD_ROOT
-cp -a %{_sourcedir}/* $RPM_BUILD_ROOT
+rm -rf %{buildroot}
+mkdir -p %{buildroot}
+cp -a %{_sourcedir}/* %{buildroot}
+cd %{buildroot}
+tar -xvzf mongo-database-tools.tar.gz
+rm mongo-database-tools.tar.gz
+mv mongo-database-tools/* ./
+rm -Rf mongo-database-tools
 if [ -d /usr/doc -a ! -e /usr/doc/mongo-database-tools -a -d /usr/share/doc/mongo-database-tools ]; then
   ln -sf ../share/doc/mongo-database-tools /usr/doc/mongo-database-tools
 fi

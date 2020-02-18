@@ -122,10 +122,11 @@ func buildLinuxPackages() {
 
 func buildRPM() {
 	mdt := "mongo-database-tools"
-	releaseName := getReleaseName()
+	//releaseName := getReleaseName()
 
 
 	// set up build directory.
+	log.Printf("create rpm directory tree\n")
 	rpmBuildDir := "rpm_build"
 	check(os.RemoveAll(rpmBuildDir), "removeAll "+rpmBuildDir)
 	check(os.MkdirAll(rpmBuildDir, os.ModePerm), "mkdirAll "+rpmBuildDir)
@@ -137,32 +138,50 @@ func buildRPM() {
 	// build the release dir.
 	// The goal here is to set up  directory with the following structure:
 	// rpmbuild/
-	// |----- RPMS/
-	// |----- SRPMS/
-	// |----- BUILD/
 	// |----- SOURCES/
-	// |         |----- tar gz archive of:
-	//                       |------ usr/
-	//                       |-- bin/
-	//                       |    |--- bsondump
-	//                       |    |--- mongo*
-	//                       |-- share/
-	//                              |---- doc/
-	//                                     |----- mongo-database-tools/
-	//                                                      |--- staticFiles
-	// |----- SPECS/
+	// |         |----- mongo-database-tools.tar.gz:
+	//                       |
+	//                      mongo-database-tools/
+	//                               |------ usr/
+	//                               |-- bin/
+	//                               |    |--- bsondump
+	//                               |    |--- mongo*
+	//                               |-- share/
+	//                                      |---- doc/
+	//                                             |----- mongo-database-tools/
+	//                                                              |--- staticFiles
 
-	log.Printf("create rpm directory tree\n")
+	// create tar file
+	log.Printf("tarring necessary files")
+	createTar := func() {
+		staticFilesPath := ".."
+		binariesPath := filepath.Join("..", "bin")
 
-	// create DEBIAN dir
-	controlDir := filepath.Join(releaseName, "DEBIAN")
-	check(os.MkdirAll(controlDir, os.ModePerm), "mkdirAll " + controlDir)
+		archiveFile, err := os.Create(mdt + ".tar.gz")
+		check(err, "create archive file")
+		defer archiveFile.Close()
 
-	// create usr/bin and usr/share/doc
-	binDir := filepath.Join(releaseName, "usr", "bin")
-	check(os.MkdirAll(binDir, os.ModePerm), "mkdirAll " + binDir)
-	docDir := filepath.Join(releaseName, "usr", "share", "doc", mdt)
-	check(os.MkdirAll(docDir, os.ModePerm), "mkdirAll " + docDir)
+		gw := gzip.NewWriter(archiveFile)
+		defer gw.Close()
+
+		tw := tar.NewWriter(gw)
+		defer tw.Close()
+
+		for _, name := range staticFiles {
+			log.Printf("adding %s to tarball\n", name)
+			src := filepath.Join(staticFilesPath, name)
+			dst := filepath.Join(mdt, "usr", "share", "doc", mdt, name)
+			addToTarball(tw, dst, src)
+		}
+
+		for _, name := range binaries {
+			log.Printf("adding %s to tarball\n", name)
+			src := filepath.Join(binariesPath, name)
+			dst := filepath.Join(mdt, "usr", "bin", name)
+			addToTarball(tw, dst, src)
+		}
+	}
+	createTar()
 }
 
 func buildDeb() {
